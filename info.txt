@@ -2,3 +2,10 @@ Strapi API Example
 
 Fetch Songs, Artists & Albums from API - Postman
 
+
+Fetch origin --> 
+Then 
+Npm install
+
+
+Npm run Strapi develop
