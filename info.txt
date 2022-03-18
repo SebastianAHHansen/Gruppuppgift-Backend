@@ -1,0 +1,4 @@
+Strapi API Example
+
+Fetch Songs, Artists & Albums from API - Postman
+
