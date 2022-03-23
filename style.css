@@ -34,8 +34,10 @@ label {
 #user,
 #pass,
 #title,
-#artist,
-#album {
+#desc,
+#length,
+#date,
+#episode {
   padding: 8px;
   border-radius: 10px;
   border: none;
