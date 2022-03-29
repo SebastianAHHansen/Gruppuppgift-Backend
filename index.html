@@ -10,42 +10,50 @@
   </head>
   <body>
     <h1>Strapi Song API Example</h1>
-    <!-- <button onclick="getSongsStrapi()">Fetch Songs</button> -->
-    <button onclick="getTitlesStrapi()">Fetch Titles</button>
+    <button onclick="getSongsStrapi()">Fetch Songs</button>
     <div id="titlesFetched"></div>
-    <!-- <button onclick="getAlbumsStrapi()">Fetch Albums</button> -->
-    <!-- <div id="songsFetched"></div> -->
-    <!-- <div id="albumsFetched"></div> -->
+    <!-- <button onclick="getPodcastTitlesStrapi()">Podcast</button> -->
+    <!-- <div id="podcastTitlesFetched"></div> -->
 
     <div>
-      <label for="user">Username</label>
-      <input type="text" id="user" /> <br />
-      <label for="pass">Password</label>
-      <input type="text" id="pass" /> <br />
+      <label for="user">Username * </label>
+      <input type="text" id="user" onchange="userValidate(this)" />
+      <div id="userError" class="errorInfo"></div>
+
+      <label for="pass">Password *</label>
+      <input type="password" id="pass" onchange="passValidate(this)" />
+      <div id="passwordError" class="errorInfo"></div>
     </div>
     <div>
-      <label for="title">Title</label>
-      <input type="text" name="title" id="title" />
+      <label for="artist">Artist</label>
+      <input
+        type="text"
+        name="artist"
+        id="artist"
+        onchange="artistValidate(this)"
+      />
+      <div id="artistError" class="errorInfo"></div>
     </div>
     <div>
-      <label for="desc">Description</label>
-      <input type="text" name="desc" id="desc" /> <br />
-    </div>
-    <div>
-      <label for="date">Date</label>
-      <input type="date" name="date" id="date" /> <br />
-    </div>
-    <div>
-      <label for="length">Length</label>
-      <input type="text" name="length" id="length" /> <br />
-    </div>
-    <div>
-      <label for="episode">Episode</label>
-      <input type="number" name="episode" id="episode" /> <br />
+      <label for="song">Song</label>
+      <input type="text" name="song" id="song" />
     </div>
 
     <div>
-      <button onclick="getToken()">Send new Data</button>
+      <label for="genre">Genre</label>
+      <input type="text" name="genre" id="genre" />
+    </div>
+    <div>
+      <label for="album">Album</label>
+      <input type="text" name="album" id="album" />
+    </div>
+    <div>
+      <label for="duration">Duration</label>
+      <input type="number" name="duration" id="duration" />
+    </div>
+
+    <div>
+      <button onclick="postData()">Send new Data</button>
     </div>
   </body>
 </html>
