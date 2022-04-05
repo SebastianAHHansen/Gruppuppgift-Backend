@@ -1,59 +1,45 @@
-//Funktion för att hämta Songs data från Strapi CMS
-async function getSongsStrapi() {
-        //URL till Strapi-API Songs
-        let url = "http://localhost:1337/api/Songs/";
+// Function - get data from Strapi CMS
+async function getPodcastsStrapi() {
+        let url = "http://localhost:1337/api/Podcasts/";
     
-        //Hämtar JSON från API och konverterar det till JS objekt
         let stringResponse = await fetch(url);
         let myObject = await stringResponse.json();
         
-        //Skriv ut Data
         let output = "<table>"; 
     
-        //Checkar om det är ett eller flera objekt som hämtas
-        //Kan undvikas genom flera funktioner; en för alla och en för unik
         if (Array.isArray(myObject.data)) {
-            //Anropa generateRow för att skapa en Header rad
             output += generateRow(myObject.data[0].attributes, null, true);
 
-            //Skapar en ForEach loop för varje element i Data-arrayen
             myObject.data.forEach((element) => {
 
-                //Gör en pekare till attribut objektet
                 let obj = element.attributes;
             
-            //Skriver Output string
             output += generateRow(obj, element.id, false);
     });
 
     } else {
-        //Gör en pekare till attribut objektet
         let obj = myObject.data.attributes;
 
-            //Skapa en Header rad
             output += generateRow(obj, null, true);
             output += generateRow(obj, myObject.data.id, false);
         }
-        //Avsluta Table tag
+
         output += "</table>"
 
-    //Skriver ut Output string till div-element
-    document.getElementById("titlesFetched").innerHTML = output;
+    document.getElementById("podcastTitlesFetched").innerHTML = output;
 }
 
-//Function GetToken()
+// Function GetToken()
 async function getToken(){
-        //Validate usernamn, password & validateSongs
         let valid = true;
         
         if (!validateLogin() ) valid = false;
-        // if ( !validateSongs() ) valid = false;
-
+        if (!validateForm() ) valid = false;
         if (!valid) return null;
 
         const urlUser = "http://localhost:1337/api/auth/local";
 
-        //Hämta värden från inputfält
+        //Collect data from input form
         const user = document.getElementById("user").value;
         const pass = document.getElementById("pass").value;
 
@@ -69,66 +55,65 @@ async function getToken(){
                 headers: {
                     "Content-Type": "application/json"
                 },
-                body: JSON.stringify({...userObject})
+                body: JSON.stringify(userObject)
             });
 
         let userJson = await userResponse.json();
 
-        if (userJson.jwt) await postData(userJson.jwt);
+        if (userJson.jwt) return userJson.jwt;
         else {
             let errMessage = userJson.error.message;
             document.getElementById("userError").innerText = errMessage;
             return null;
         }
-}
 
-//Function postData()
+    }
+
+// Function postData()
 async function postData(){
     let token = await getToken();
     if (!token) return;
-    alert("Hello");
 
-    const urlSongs = "http://localhost:1337/api/Songs/";
+    const urlPodcasts = "http://localhost:1337/api/Podcasts/";
 
-    //Hämtar data från fält
-    const artist = document.getElementById("artist").value;
-    const song = document.getElementById("song").value;
-    const genre = document.getElementById("genre").value;
-    const album = document.getElementById("album").value;
-    const duration = document.getElementById("duration").value;
+    //Get data from object
+    const title = document.getElementById("title").value;
+    const desc = document.getElementById("desc").value;
+    const date = document.getElementById("date").value;
+    const length = document.getElementById("length").value;
+    const episode = document.getElementById("episode").value;
 
     //Skapa ett objekt med data inkluderat
-        let titleObject = {
+        let dataObject = {
             data : {
-                Artist: artist,
-                Song: song,
-                Genre: genre,
-                Album: album,
-                Duration: duration
+                Title: title,
+                Description: desc,
+                Date: date,
+                Length: length,
+                Episode: episode
             }
         };
 
-        //Anropar API med titleObject
-        let titleResponse = await fetch(urlSongs,
+        //Calls API
+        let podcastResponse = await fetch(urlPodcasts,
             {
                 method: 'POST',
                 headers: {
                     "Content-Type": "application/json",
                     "Authorization": "Bearer " + token,
                 },
-                body: JSON.stringify(titleObject),
+                body: JSON.stringify(dataObject),
             });
 
-            let songJson = await titleResponse.json();
-            console.log(songJson);
+            let podcastJson = await podcastResponse.json();
+            console.log(podcastJson);
 }
 
-//Funktioner för Validering
+// User Validation
 function userValidate(comp){
     let valid = true;
 
     if (comp.value.length == 0) {
-        //Misslyckad validering
         valid = false;
     }
 
@@ -141,12 +126,11 @@ function userValidate(comp){
     }
 }
 
-//Validering av Password Input
+// Password Validation
 function passValidate(comp){
     let valid = true;
 
     if (comp.value.length <= 5) {
-        //Misslyckad validering
         valid = false;
     }
 
@@ -159,6 +143,7 @@ function passValidate(comp){
     }
 }
 
+// Login Validation
 function validateLogin(){
     let valid = true;
 
@@ -168,239 +153,124 @@ function validateLogin(){
     if (!passValidate(document.getElementById("pass"))) {
         valid = false;
     }
-    return false;
+    return valid;
+
 }
 
-//Validering av artistinput
-function artistValidate(comp) {
+// Input Form Validation
+function formValidate(comp) {
     let valid = true;
 
     if (comp.value.length == 0) {
         valid = false;
-        document.getElementById("artistError").innerText = "You have to fill in the input!";
-    }
-
-    //Om värdet är ett nummer 
-    if ( !isNaN( comp.value ) && comp.value.length != 0 ) {
-        valid = false;
-        document.getElementById("artistError").innerText = "Could not be a number.";
+        document.getElementById("formError").innerText = "Fill in all input fields";
     }
     if (valid) {
-        document.getElementById("artistError").innerText = "";
+        document.getElementById("formError").innerText = "";
     }
+
     return valid;
 }
 
-//Validering av Songs
-function validateSongs() {
+//Titles, Description, Date, Length & Episode Validation
+function validateForm() {
     let valid = true;
-
-    //Validate artistValidate
-    if ( !artistValidate(document.getElementById("artist")) ){
+    if ( !formValidate(document.getElementById("title", "desc", "date", "length", "episode")) ) {
         valid = false;
     }
-    //Skapa funktioner för samtliga fält
-
     return valid;
 }
 
-//Genererat tabellrad med det inkluderade värder. Skapar TH 
-function generateRow(obj, objId, header) {
+//Generate Row - output
+function generateRow(object, objectId, header) {
     let output = "<tr>";
     let forbiddenParameters = ["createdAt", "updatedAt", "publishedAt"];
 
     //For in loop för att gå igenom alla parametrar i obj
-    for (x in obj) {
-        //x = parameterns namn
-        //obj[x] = parameterns värde
-
-        //Kontrollera att x är en tillåten parameter
-        //Keyword Continue går vidare till nästa parameter i loopen
+    for (x in object) {
         if (forbiddenParameters.includes(x)) continue;
 
         if (header) output += `<th>${x}</th>`;
-        else output += `<td>${obj[x]}</td>`;
+        else output += `<td>${object[x]}</td>`;
     }
 
-    //Skapa Update & Delete knapp för TD rad
+    //Update & Delete button
     if (!header) {
-        let postUrl = `http://localhost:1337/api/Songs/${objId}`;
-        //Inkludera en update knapp
-        output += `<td><button onclick="updatePost(${postUrl});">Update</button></td>`;
-        output += `<td><button onclick="deletePost(${postUrl}));">Delete</button></td>`;
+        let podcastUrl = `http://localhost:1337/api/Podcasts/${objectId}`;
+        output += `<td><button onclick="updatePost(${podcastUrl});">Update</button></td>`;
+        output += `<td><button onclick="deletePost(${podcastUrl}));">Delete</button></td>`;
     }
     output += "</tr>";
 
     return output;
 }
 
-//Function UpdatePost
-async function updatePost(url){
-    let token = await getToken();
-    if (!token) return;
 
- //Hämtar data från fält
- const artist = document.getElementById("artist").value;
- const song = document.getElementById("song").value;
- const genre = document.getElementById("genre").value;
- const album = document.getElementById("album").value;
- const duration = document.getElementById("duration").value;
 
- //Skapa ett objekt med data inkluderat
-     let titleObject = {
-         data : {}
-     };
 
-     if (artist) titleObject.data["artist"] = artist;
-     if (song) titleObject.data["song"] = song;
-     if (genre) titleObject.data["genre"] = genre;
-     if (album) titleObject.data["album"] = album;
-     if (duration) titleObject.data["duration"] = duration;
+
+
+// //Function UpdatePost
+// async function updatePost(url){
+//     let token = await getToken();
+//     if (!token) return;
+
+//  //Collects data from input fields
+//  const title = document.getElementById("title").value;
+//  const desc = document.getElementById("desc").value;
+//  const date = document.getElementById("date").value;
+//  const length = document.getElementById("length").value;
+//  const episode = document.getElementById("episode").value;
+
+//      let titleObject = {
+//          data : {}
+//      };
+
+//      if (title) titleObject.data["title"] = title;
+//      if (desc) titleObject.data["desc"] = desc;
+//      if (date) titleObject.data["date"] = date;
+//      if (length) titleObject.data["length"] = length;
+//      if (episode) titleObject.data["episode"] = episode;
      
-     await fetch(url, 
-        {
-            method: 'PUT',
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": "Bearer " + token
-            },
-            body: JSON.stringify(titleObject)
-        });
+//      await fetch(url, 
+//         {
+//             method: 'PUT',
+//             headers: {
+//                 "Content-Type": "application/json",
+//                 "Authorization": "Bearer " + token
+//             },
+//             body: JSON.stringify(titleObject)
+//         });
     
-    await getSongsStrapi();
-}
+//     await getSongsStrapi();
+// }
 
-//Function DeletePost
-async function deletePost(url){
-    let token = await getToken();
-    if (!token) return;
+// //Function DeletePost
+// async function deletePost(url){
+//     let token = await getToken();
+//     if (!token) return;
 
-    await fetch(url, 
-    {
-        method: 'DELETE',
-        headers: {
-            "Content-Type": "application/json",
-            "Authorization": "Bearer " + token
-        },
-    });
-
-await getSongsStrapi();
-}
-
-
-// <--------------- Function getPodcastTitlesStrapi() Podcast -----------------------
-/*
-//     async function getPodcastTitlesStrapi() {
-//         //URL till Strapi-API Podcasts
-//         let podcastUrl = "http://localhost:1337/api/Podcasts/";
-    
-//         //Hämtar JSON från API och konverterar det till JS objekt
-//         let stringResponse = await fetch(podcastUrl);
-//         let myObject = await stringResponse.json();
-        
-//         //Skriv ut Data
-//         let output = ""; 
-    
-//         //Checkar om det är ett eller flera objekt som hämtas
-//         //Kan undvikas genom flera funktioner; en för alla och en för unik
-//         if (Array.isArray(myObject.data)) {
-
-//             //Skapar en ForEach loop för varje element i Data-arrayen
-//             myObject.data.forEach((element) => {
-
-//                 //Gör en pekare till attribut objektet
-//                 let attr = element.attributes;
-            
-//                 for (x in attr) {
-//                     console.log(x + ": " + attr[x]);
-//                 }
-            
-//             //Skriver Output string
-//             output += `<div>Title: ${attr.Title}</div>`;
+//     await fetch(url, 
+//     {
+//         method: 'DELETE',
+//         headers: {
+//             "Content-Type": "application/json",
+//             "Authorization": "Bearer " + token
+//         },
 //     });
 
-//     } else {
-//         //Gör en pekare till attribut objektet
-//         let obj = myObject.data.attributes;
-//         for (x in obj) {
-//             console.log( x + ": " + obj[x]);
-//         }
-//     }
-//     //Skriver ut Output string till div-element
-//     document.getElementById("podcastTitlesFetched").innerHTML = output;
+// await getSongsStrapi();
 // }
-*/
 
-// ---------------- Function getToken() Podcast -----------------------
-/*
-async function getToken(){
-        // 1. Göra ett inloggningsförsök för att få en Token returnerad
-        // 2. Samla data och skapa ett objekt av dessa
-        // 3. Skicka iväg JSON till API
-        const urlUser = "http://localhost:1337/api/auth/local/";
+//Clear Input Forms()
+// function clearInputForms() {
+//     document.getElementById("user").value = "";
+//     document.getElementById("pass").value = "";
+//     document.getElementById("title").value = "";
+//     document.getElementById("desc").value = "";
+//     document.getElementById("date").value = "";
+//     document.getElementById("length").value = "";
+//     document.getElementById("episode").value = "";
 
-        //Hämta värden från inputfält
-        const user = document.getElementById("user").value;
-        const pass = document.getElementById("pass").value;
-
-        const userObject = {
-            identifier: user,
-            password: pass,
-        };
-
-        //Anropar API med inloggningsdata
-        let userResponse = await fetch(urlUser,
-            {
-                method: 'POST',
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({...userObject})
-            });
-        let userJson = await userResponse.json();
-
-        if (userJson.jwt) await postData(userJson.jwt);
-
-            // //Ta ut Token från Objekt
-            // const userToken = userJson.jwt;
-}
-*/
-
-// ---------------- Function postData() Podcast -----------------------
-/*
-    async function postData(token){
-    const urlPodcasts = "http://localhost:1337/api/Podcasts/";
-
-    //Hämtar data från fält
-    const title = document.getElementById("title").value;
-    const description = document.getElementById("desc").value;
-    const date = document.getElementById("date").value;
-    const episode = document.getElementById("episode").value;
-    const length = document.getElementById("length").value;
-
-
-    //Skapa ett objekt med data inkluderat
-        let titleObject = {
-            data : {
-                Title: title,
-                Description: description,
-                Date: date,
-                Episode: episode,
-                Length: length
-            },
-        };
-
-        //Anropar API med titleObject
-        let titleResponse = await fetch(urlPodcasts,
-            {
-                method: 'POST',
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: "Bearer " + token,
-                },
-                body: JSON.stringify(titleObject),
-            });
-            let podcastJson = await titleResponse.json();
-            console.log(podcastJson);
-}
-*/
+//     document.getElementById("output").innerHTML = "<p>Input forms cleared</p>";
+// };

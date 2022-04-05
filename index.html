@@ -6,12 +6,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="style.css" />
     <script src="script.js"></script>
-    <title>Kolumn</title>
+    <title>Strapi Podcast</title>
   </head>
   <body>
     <h1>Strapi Podcast API Example</h1>
-    <button onclick="getSongsStrapi()">Fetch Podcasts</button>
-    <div id="podcastTitlesFetched"></div>
+    <button onclick="getPodcastsStrapi()">Fetch Podcasts</button>
+    <div class="fetchOutput">
+      <div id="podcastTitlesFetched"></div>
+    </div>
 
     <div>
       <label for="user">Username * </label>
@@ -25,55 +27,30 @@
     <div id="output"></div>
     <div>
       <label for="title">Title</label>
-      <input type="text" name="title" id="title" required />
+      <input type="text" id="title" />
     </div>
     <div>
       <label for="desc">Description</label>
-      <input type="text" name="desc" id="desc" /> <br />
+      <input type="text" id="desc" />
     </div>
     <div>
       <label for="date">Date</label>
-      <input type="date" name="date" id="date" /> <br />
+      <input type="date" id="date" />
+      <br />
     </div>
     <div>
       <label for="length">Length</label>
-      <input type="text" name="length" id="length" /> <br />
+      <input type="text" id="length" />
+      <br />
     </div>
     <div>
       <label for="episode">Episode</label>
-      <input type="number" name="episode" id="episode" /> <br />
+      <input type="number" name="episode" id="episode" />
+      <br />
     </div>
-
+    <div id="formError" class="errorInfo"></div>
     <div>
       <button onclick="postData()">Send new Data</button>
-      <button onclick="clearInputForms()">Clear Forms</button>
     </div>
-    <!-- <div>
-      <label for="artist">Artist</label>
-      <input
-        type="text"
-        name="artist"
-        id="artist"
-        onchange="artistValidate(this)"
-      />
-      <div id="artistError" class="errorInfo"></div>
-    </div>
-    <div>
-      <label for="song">Song</label>
-      <input type="text" name="song" id="song" />
-    </div>
-
-    <div>
-      <label for="genre">Genre</label>
-      <input type="text" name="genre" id="genre" />
-    </div>
-    <div>
-      <label for="album">Album</label>
-      <input type="text" name="album" id="album" />
-    </div>
-    <div>
-      <label for="duration">Duration</label>
-      <input type="number" name="duration" id="duration" />
-    </div> -->
   </body>
 </html>

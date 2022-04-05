@@ -9,7 +9,7 @@ body {
   color: beige;
 }
 
-.titlesFetched {
+.fetchOutput {
   justify-content: center;
   align-items: center;
 }
@@ -39,11 +39,6 @@ label {
 #user,
 #pass,
 #title,
-#song,
-#artist,
-#genre,
-#album,
-#duration,
 #desc,
 #length,
 #date,
