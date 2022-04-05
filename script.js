@@ -82,6 +82,7 @@ async function postData(){
     const date = document.getElementById("date").value;
     const length = document.getElementById("length").value;
     const episode = document.getElementById("episode").value;
+    const category = document.getElementById("category").value;
 
     //Skapa ett objekt med data inkluderat
         let dataObject = {
@@ -90,7 +91,8 @@ async function postData(){
                 Description: desc,
                 Date: date,
                 Length: length,
-                Episode: episode
+                Episode: episode,
+                Category: category
             }
         };
 
@@ -175,7 +177,7 @@ function formValidate(comp) {
 //Titles, Description, Date, Length & Episode Validation
 function validateForm() {
     let valid = true;
-    if ( !formValidate(document.getElementById("title", "desc", "date", "length", "episode")) ) {
+    if ( !formValidate(document.getElementById("title", "desc", "date", "length", "episode", "category")) ) {
         valid = false;
     }
     return valid;
@@ -197,80 +199,80 @@ function generateRow(object, objectId, header) {
     //Update & Delete button
     if (!header) {
         let podcastUrl = `http://localhost:1337/api/Podcasts/${objectId}`;
-        output += `<td><button onclick="updatePost(${podcastUrl});">Update</button></td>`;
-        output += `<td><button onclick="deletePost(${podcastUrl}));">Delete</button></td>`;
+        output += `<td><button onclick="updatePost('${podcastUrl}');">Update</button></td>`;
+        output += `<td><button onclick="deletePost('${podcastUrl}');">Delete</button></td>`;
     }
     output += "</tr>";
 
     return output;
 }
 
+// Function DeletePost
+async function deletePost(url) {
+    let token = await getToken();
+    if (!token) return;
 
 
+    await fetch(url,
+        {
+            method: 'DELETE',
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization" : "Bearer " + token
+            }
+        });
 
+    await getPodcastsStrapi();
 
+}
 
-// //Function UpdatePost
-// async function updatePost(url){
-//     let token = await getToken();
-//     if (!token) return;
+// Function UpdatePost
+async function updatePost(url){
+    let token = await getToken();
+    if (!token) return;
 
-//  //Collects data from input fields
-//  const title = document.getElementById("title").value;
-//  const desc = document.getElementById("desc").value;
-//  const date = document.getElementById("date").value;
-//  const length = document.getElementById("length").value;
-//  const episode = document.getElementById("episode").value;
+ //Collects data from input fields
+ const title = document.getElementById("title").value;
+ const desc = document.getElementById("desc").value;
+ const date = document.getElementById("date").value;
+ const length = document.getElementById("length").value;
+ const episode = document.getElementById("episode").value;
+ const category = document.getElementById("category").value;
 
-//      let titleObject = {
-//          data : {}
-//      };
+     let dataObject = {
+         data : {}
+     };
 
-//      if (title) titleObject.data["title"] = title;
-//      if (desc) titleObject.data["desc"] = desc;
-//      if (date) titleObject.data["date"] = date;
-//      if (length) titleObject.data["length"] = length;
-//      if (episode) titleObject.data["episode"] = episode;
+     if (title) dataObject.data["title"] = title;
+     if (desc) dataObject.data["desc"] = desc;
+     if (date) dataObject.data["date"] = date;
+     if (length) dataObject.data["length"] = length;
+     if (episode) dataObject.data["episode"] = episode;
+     if (category) dataObject.data["category"] = episode;
      
-//      await fetch(url, 
-//         {
-//             method: 'PUT',
-//             headers: {
-//                 "Content-Type": "application/json",
-//                 "Authorization": "Bearer " + token
-//             },
-//             body: JSON.stringify(titleObject)
-//         });
+     await fetch(url, 
+        {
+            method: 'PUT',
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + token
+            },
+            body: JSON.stringify(dataObject)
+        });
     
-//     await getSongsStrapi();
-// }
+    await getPodcastsStrapi();
+}
 
-// //Function DeletePost
-// async function deletePost(url){
-//     let token = await getToken();
-//     if (!token) return;
+// Clears Input Forms()
+function clearInputForms() {
+    document.getElementById("user").value = "";
+    document.getElementById("pass").value = "";
+    document.getElementById("title").value = "";
+    document.getElementById("desc").value = "";
+    document.getElementById("date").value = "";
+    document.getElementById("length").value = "";
+    document.getElementById("episode").value = "";
+    document.getElementById("category").value = "";
 
-//     await fetch(url, 
-//     {
-//         method: 'DELETE',
-//         headers: {
-//             "Content-Type": "application/json",
-//             "Authorization": "Bearer " + token
-//         },
-//     });
-
-// await getSongsStrapi();
-// }
-
-//Clear Input Forms()
-// function clearInputForms() {
-//     document.getElementById("user").value = "";
-//     document.getElementById("pass").value = "";
-//     document.getElementById("title").value = "";
-//     document.getElementById("desc").value = "";
-//     document.getElementById("date").value = "";
-//     document.getElementById("length").value = "";
-//     document.getElementById("episode").value = "";
-
-//     document.getElementById("output").innerHTML = "<p>Input forms cleared</p>";
-// };
+    document.getElementById("output").innerHTML = "<p>Input forms cleared</p>";
+};

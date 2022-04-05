@@ -42,7 +42,8 @@ label {
 #desc,
 #length,
 #date,
-#episode {
+#episode,
+#category {
   padding: 8px;
   border-radius: 10px;
   border: none;
@@ -54,4 +55,8 @@ label {
 .errorInfo {
   font-size: 16px;
   color: red;
+}
+
+hr {
+  width: 50%;
 }
