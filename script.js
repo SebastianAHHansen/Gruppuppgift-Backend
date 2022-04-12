@@ -1,5 +1,6 @@
 // Function - get data from Strapi CMS
 async function getPodcastsStrapi() {
+        //Collect API from Strapi
         let url = "http://localhost:1337/api/Podcasts/";
     
         let stringResponse = await fetch(url);
@@ -14,6 +15,7 @@ async function getPodcastsStrapi() {
 
                 let obj = element.attributes;
             
+            //Prints out output
             output += generateRow(obj, element.id, false);
     });
 
@@ -33,13 +35,14 @@ async function getPodcastsStrapi() {
 async function getToken(){
         let valid = true;
         
+        //If loginValidation fails - return 
         if (!validateLogin() ) valid = false;
         if (!validateForm() ) valid = false;
         if (!valid) return null;
 
         const urlUser = "http://localhost:1337/api/auth/local";
 
-        //Collect data from input form
+        //Collect data from usernamn & password input form
         const user = document.getElementById("user").value;
         const pass = document.getElementById("pass").value;
 
@@ -48,7 +51,7 @@ async function getToken(){
             password: pass,
         };
 
-        //Anropar API med inloggningsdata - inkluderar Method & Headers
+        //Calls API with login data - includes Method & Headers
         let userResponse = await fetch(urlUser,
             {
                 method: 'POST',
@@ -61,16 +64,18 @@ async function getToken(){
         let userJson = await userResponse.json();
 
         if (userJson.jwt) return userJson.jwt;
+
+        //If autorization code is not collected, return error message
         else {
             let errMessage = userJson.error.message;
             document.getElementById("userError").innerText = errMessage;
             return null;
         }
-
     }
 
 // Function postData()
 async function postData(){
+    //If validation is correct, proceed. Else, return 
     let token = await getToken();
     if (!token) return;
 
@@ -84,7 +89,7 @@ async function postData(){
     const episode = document.getElementById("episode").value;
     const category = document.getElementById("category").value;
 
-    //Skapa ett objekt med data inkluderat
+    //Creates object with data input
         let dataObject = {
             data : {
                 Title: title,
@@ -96,7 +101,6 @@ async function postData(){
             }
         };
 
-        //Calls API
         let podcastResponse = await fetch(urlPodcasts,
             {
                 method: 'POST',
@@ -115,13 +119,17 @@ async function postData(){
 function userValidate(comp){
     let valid = true;
 
+    //If input value is not correct- return false
     if (comp.value.length == 0) {
         valid = false;
     }
 
+    //If/else statement. If not valid - return false, show userError.
     if (!valid) {
         document.getElementById("userError").innerText ="Enter a valid Username!";
         return false;
+    
+    //If/else statement. If valid - return true, no userError.
     } else {
         document.getElementById("userError").innerText = "";
         return true;
@@ -132,13 +140,17 @@ function userValidate(comp){
 function passValidate(comp){
     let valid = true;
 
+    //Password must be at least 6 characters long. If not, return false
     if (comp.value.length <= 5) {
         valid = false;
     }
 
+    //If/else statement. If not valid - return false, show passwordError.
     if (!valid) {
         document.getElementById("passwordError").innerText = "Password must be at least 6 charcters long!";
         return false;
+    
+    //If/else statement. If valid - return true, no passwordError.
     } else {
         document.getElementById("passwordError").innerText = "";
         return true;
@@ -149,24 +161,29 @@ function passValidate(comp){
 function validateLogin(){
     let valid = true;
 
+    //If username & password is not correct - validation incompleted.
     if (!userValidate(document.getElementById("user"))) {
         valid = false;
     }
     if (!passValidate(document.getElementById("pass"))) {
         valid = false;
     }
+    //Else validation completed
     return valid;
-
 }
+
 
 // Input Form Validation
 function formValidate(comp) {
     let valid = true;
 
+    //If input form is empty, return formError. Valid false.
     if (comp.value.length == 0) {
         valid = false;
         document.getElementById("formError").innerText = "Fill in all input fields";
     }
+
+    //If form contains value, return valid
     if (valid) {
         document.getElementById("formError").innerText = "";
     }
@@ -174,18 +191,25 @@ function formValidate(comp) {
     return valid;
 }
 
-//Titles, Description, Date, Length & Episode Validation
+//Form Validation - Titles, Description, Date, Length & Episode
 function validateForm() {
     let valid = true;
+
+    //If input form misses value, return false
     if ( !formValidate(document.getElementById("title", "desc", "date", "length", "episode", "category")) ) {
         valid = false;
     }
+    
+    //If every input form contains value, return valid
     return valid;
 }
+
 
 //Generate Row - output
 function generateRow(object, objectId, header) {
     let output = "<tr>";
+
+    //Do not show these values
     let forbiddenParameters = ["createdAt", "updatedAt", "publishedAt"];
 
     //For in loop för att gå igenom alla parametrar i obj
@@ -196,10 +220,9 @@ function generateRow(object, objectId, header) {
         else output += `<td>${object[x]}</td>`;
     }
 
-    //Update & Delete button
+    //Delete button
     if (!header) {
         let podcastUrl = `http://localhost:1337/api/Podcasts/${objectId}`;
-        output += `<td><button onclick="updatePost('${podcastUrl}');">Update</button></td>`;
         output += `<td><button onclick="deletePost('${podcastUrl}');">Delete</button></td>`;
     }
     output += "</tr>";
@@ -207,26 +230,8 @@ function generateRow(object, objectId, header) {
     return output;
 }
 
-// Function DeletePost
-async function deletePost(url) {
-    let token = await getToken();
-    if (!token) return;
 
-
-    await fetch(url,
-        {
-            method: 'DELETE',
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization" : "Bearer " + token
-            }
-        });
-
-    await getPodcastsStrapi();
-
-}
-
-// Function UpdatePost
+// // Function UpdatePost
 async function updatePost(url){
     let token = await getToken();
     if (!token) return;
@@ -263,8 +268,30 @@ async function updatePost(url){
     await getPodcastsStrapi();
 }
 
-// Clears Input Forms()
+
+// Function DeletePost
+async function deletePost(url) {
+    //Collect autorization token. If fail, return (false).
+    let token = await getToken();
+    if (!token) return;
+
+
+    await fetch(url,
+        {
+            method: 'DELETE',
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization" : "Bearer " + token
+            }
+        });
+
+    await getPodcastsStrapi();
+}
+
+
+//Function clearInputForms()
 function clearInputForms() {
+    //Clears every input form
     document.getElementById("user").value = "";
     document.getElementById("pass").value = "";
     document.getElementById("title").value = "";
